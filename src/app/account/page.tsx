@@ -28,6 +28,8 @@ export default function AccountPage() {
     try {
       await apiFetch('/auth/logout', { method: 'POST' });
     } catch {}
+    document.cookie = 'access_token=; path=/; max-age=0';
+    document.cookie = 'logged_in=; path=/; max-age=0';
     router.push('/');
   };
 

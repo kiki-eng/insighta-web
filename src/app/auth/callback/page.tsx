@@ -2,25 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
 
 export default function AuthCallback() {
   const router = useRouter();
 
   useEffect(() => {
-    async function verify() {
-      try {
-        const res = await apiFetch('/auth/me');
-        if (res.ok) {
-          router.push('/dashboard');
-        } else {
-          router.push('/?error=auth_failed');
-        }
-      } catch {
-        router.push('/?error=auth_failed');
-      }
-    }
-    verify();
+    const logged = document.cookie.includes('logged_in=true');
+    router.push(logged ? '/dashboard' : '/?error=auth_failed');
   }, [router]);
 
   return (

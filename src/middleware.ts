@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const isProtected = protectedPaths.some(p => pathname.startsWith(p));
 
   if (isProtected) {
-    const token = request.cookies.get('access_token');
+    const token = request.cookies.get('access_token') || request.cookies.get('logged_in');
     if (!token) {
       return NextResponse.redirect(new URL('/', request.url));
     }

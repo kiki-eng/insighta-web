@@ -2,6 +2,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hng-stage0-backend-p
 
 export { API_URL };
 
+function getAccessToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)access_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -12,25 +18,27 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     headers['X-API-Version'] = '1';
   }
 
+  const token = getAccessToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   let res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,
-    credentials: 'include',
   });
 
   if (res.status === 401) {
-    const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-    });
+    const refreshRes = await fetch('/api/auth/refresh', { method: 'POST' });
 
     if (refreshRes.ok) {
+      const newToken = getAccessToken();
+      if (newToken) {
+        headers['Authorization'] = `Bearer ${newToken}`;
+      }
       res = await fetch(`${API_URL}${path}`, {
         ...options,
         headers,
-        credentials: 'include',
       });
     } else {
       if (typeof window !== 'undefined') {

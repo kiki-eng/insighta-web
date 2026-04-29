@@ -4,8 +4,8 @@ import { API_URL } from '@/lib/api';
 
 export default function LoginPage() {
   const handleLogin = () => {
-    const state = Math.random().toString(36).substring(2) + '|' + encodeURIComponent(window.location.origin + '/auth/callback') + '|source=web';
-    window.location.href = `${API_URL}/auth/github?redirect_uri=${encodeURIComponent(window.location.origin + '/auth/callback')}&state=${encodeURIComponent(state)}&source=web`;
+    const callbackUrl = window.location.origin + '/api/auth/callback';
+    window.location.href = `${API_URL}/auth/github?redirect_uri=${encodeURIComponent(callbackUrl)}&source=web`;
   };
 
   return (
